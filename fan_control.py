@@ -226,12 +226,12 @@ def main():
 
             if not state[host['name']]['is_remote']:
                 cores = []
-                for sensor in sensors.get_detected_chips():
+                for sensor in sensors.iter_detected_chips():
                     if sensor.prefix == "coretemp":
                         cores.append(sensor)
                 for core in cores:
-                    for feature in core.get_features():
-                        for subfeature in core.get_all_subfeatures(feature):
+                    for feature in core.iter_features():
+                        for subfeature in core.iter_all_subfeatures(feature):
                             if subfeature.name.endswith("_input"):
                                 temps.append(core.get_value(subfeature.number))
             else:
@@ -239,7 +239,7 @@ def main():
                 temps = list(map(lambda n: float(n), cmd.read().strip().split('\n')))
                 cmd.close()
 
-            temp_average = round(sum(temps)/len(temps))
+            temp_average = round(sum(temps)/len(temps)) if temps else 45
             compute_fan_speed(temp_average, host)
 
         time.sleep(config['general']['interval'])
